@@ -16,6 +16,16 @@ class DriverDetails(mongoengine.EmbeddedDocument):
     car_number_plate = mongoengine.StringField(required=True)
     license_number = mongoengine.StringField(required=True)
 
+    def to_dict(self):
+        """
+        Returns a dictionary representation of the driver details
+        """
+        return {
+            "car_model": self.car_model,
+            "car_number_plate": self.car_number_plate,
+            "license_number": self.license_number
+        }
+
 
 class User(mongoengine.Document):
     """
