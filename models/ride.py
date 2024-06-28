@@ -8,6 +8,23 @@ from bson import ObjectId
 from datetime import datetime
 
 
+class Request(mongoengine.EmbeddedDocument):
+    """
+    Request model class attributes and methods defination
+    """
+    user_id = mongoengine.ObjectIdField(required=True)
+    status = mongoengine.StringField(default='pending')
+
+    def to_dict(self):
+        """
+        Returns a dictionary representation of the object
+        """
+        return {
+            'user_id': str(self.user_id),
+            'status': self.status
+        }
+
+
 class Ride(mongoengine.Document):
     """
     Ride model class attributes and methods defination
@@ -19,6 +36,7 @@ class Ride(mongoengine.Document):
     date_time = mongoengine.DateTimeField(required=True)
     available_seats = mongoengine.IntField(required=True)
     booked_seats = mongoengine.ListField()
+    requests = mongoengine.EmbeddedDocumentListField(Request)
     max_chargeable_fare = mongoengine.FloatField(required=True)
     reviewed = mongoengine.BooleanField(default=False)
     updated_at = mongoengine.DateTimeField()
@@ -39,11 +57,22 @@ class Ride(mongoengine.Document):
 
     def add_booking(self, user_id):
         """
-        Adds a user to a ride and adjusts the max chargable fare
+        Adds a user to a ride and adjusts the max chargeable fare
         """
         self.booked_seats.append(user_id)
         passangers = len(self.booked_seats) + 1
-        self.max_chargeable_fare = self.chargeable_fare / passangers
+        self.max_chargeable_fare = self.chargeable_fare() / passangers
+        self.available_seats -= 1
+        self.save()
+
+    def remove_booking(self, user_id):
+        """
+        Removes a users from a ride and adjusts the max chargeable fare
+        """
+        self.booked_seats.remove(user_id)
+        passangers = len(self.booked_seats) + 1
+        self.max_chargeable_fare = self.chargeable_fare() / passangers
+        self.available_seats += 1
         self.save()
 
     def todict(self):
@@ -57,6 +86,14 @@ class Ride(mongoengine.Document):
                 value = str(value)
             elif isinstance(value, datetime):
                 value = value.isoformat()
+            elif isinstance(value, mongoengine.EmbeddedDocument):
+                value = value.to_dict()
+            elif isinstance(value, list):
+                value = [
+                    v.to_dict() if isinstance(
+                        v, mongoengine.EmbeddedDocument
+                        ) else v for v in value
+                    ]
             obj_dict[field] = value
         return obj_dict
 

@@ -27,6 +27,27 @@ class DriverDetails(mongoengine.EmbeddedDocument):
         }
 
 
+class Review(mongoengine.EmbeddedDocument):
+    """
+    Defines a review class attribute and methods
+    """
+    ride_id = mongoengine.ObjectIdField(required=True)
+    user_id = mongoengine.ObjectIdField(required=True)
+    rating = mongoengine.IntField(required=True)
+    feedback = mongoengine.StringField()
+
+    def to_dict(self):
+        """
+        Returns a dictionary representation of the instance
+        """
+        return {
+            "ride_id": str(self.ride_id),
+            "user_id": str(self.user_id),
+            "rating": self.rating,
+            "feedback": self.feedback
+        }
+
+
 class User(mongoengine.Document):
     """
     User model class attributes and methods defination
@@ -40,6 +61,7 @@ class User(mongoengine.Document):
     preferences = mongoengine.DictField()
     role = mongoengine.StringField(default='passenger')
     driver_details = mongoengine.EmbeddedDocumentField(DriverDetails)
+    reviews = mongoengine.EmbeddedDocumentListField(Review)
     reset_token = mongoengine.UUIDField()
     account_verified = mongoengine.BooleanField(default=False)
     created_at = mongoengine.DateTimeField(default=datetime.now)
@@ -61,6 +83,12 @@ class User(mongoengine.Document):
                 value = value.to_dict()
             elif isinstance(value, datetime):
                 value = value.isoformat()
+            elif isinstance(value, list):
+                value = [
+                    v.to_dict() if isinstance(
+                        v, mongoengine.EmbeddedDocument
+                        ) else v for v in value
+                        ]
             obj_dict[field_name] = value
         if self.role == 'passenger':
             del obj_dict['driver_details']
