@@ -6,6 +6,7 @@ from flask import jsonify, request
 from models.user import User
 from models.ride import Ride
 from . import app_views
+from api.v1.utils import get_distance
 from datetime import datetime
 from bson import ObjectId
 import re
@@ -24,7 +25,6 @@ def add_ride():
     required = [
         'origin',
         'destination',
-        'distance',
         'date_time',
         'available_seats'
         ]
@@ -42,7 +42,16 @@ def add_ride():
         if key == 'date_time':
             value = datetime.strptime(value, '%Y-%m-%dT%H:%M:%S')
         setattr(ride, key, value)
-    ride.max_chargeable_fare = ride.chargeable_fare()
+    distance = get_distance(data.get('origin'), data.get('destination'))
+    if distance.get('status') != 'Found':
+        response = {}
+        if distance.get('message_1'):
+            response['destination_error'] = distance.get('message_1')
+        if distance.get('message_2'):
+            response['origin_error'] = distance.get['message_2']
+        return jsonify(response), 404
+    ride.distance = distance.get('distance')
+    ride.offer_trip_fee = ride.chargeable_fare()
     ride.driver_id = ObjectId(user_id)
     ride.save()
     return jsonify(ride.todict()), 201
@@ -81,7 +90,7 @@ def update_ride(ride_id):
     return jsonify(ride.todict()), 200
 
 
-@app_views.route('/rides/search', methods=['POST'], strict_slashes=False)
+@app_views.route('/rides/trips', methods=['POST'], strict_slashes=False)
 def search_rides():
     """
     Searches and returns rides
