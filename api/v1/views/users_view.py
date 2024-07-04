@@ -5,7 +5,7 @@ View for User object that handles all RESTFul API actions
 from flask import jsonify, request
 from models.user import User
 from models.user import DriverDetails
-from api.v1.utils import hash_password
+from api.v1.utils import hash_password, send_email, generate_uuid
 from . import app_views
 from datetime import datetime
 import bcrypt
@@ -34,6 +34,13 @@ def register_user():
     for key, value in data.items():
         setattr(user, key, value)
     user.save()
+    uuid = generate_uuid()
+    setattr(user, 'confirmation_token', uuid)
+    user.save()
+    confirmation_endpoint = 'http://127.0.0.1:5000/api/v1/users/confirmations'
+    msg = f'click {confirmation_endpoint}/{uuid} to verify account'
+    if send_email(user.email, 'Verify Account', msg):
+        pass
     return jsonify(user.todict()), 201
 
 
@@ -155,10 +162,10 @@ def update_driver_details(user_id):
     return jsonify(user.todict()), 200
 
 
-@app_views.route('/users/login', methods=['POST'], strict_slashes=False)
+@app_views.route('/users/auth_token', methods=['POST'], strict_slashes=False)
 def user_login():
     """
-    Logins in the user session
+    Creates authorization token for the user to login
     """
     data = request.json
     if not data:
@@ -174,3 +181,71 @@ def user_login():
         return jsonify({'error': 'Wrong Email or Password'}), 400
     access_token = create_access_token(identity=str(user.id))
     return jsonify(access_token=access_token)
+
+
+@app_views.route(
+        '/users/confirmations/<uuid>',
+        methods=['GET'],
+        strict_slashes=False)
+@jwt_required()
+def confirm_account(uuid):
+    """
+    Verifies account with uuid
+    """
+    user_id = get_jwt_identity()
+    user = User.objects(id=user_id).first()
+    if not user:
+        return jsonify({'error': 'User Not Found'}), 404
+    if str(user.confirmation_token) == uuid:
+        setattr(user, 'account_verified', True)
+        user.save()
+        user.update(unset__confirmation_token=1)
+        return jsonify({'Message': 'Account Verfied'}), 200
+    return jsonify({'error': 'Verification Failed'}), 400
+
+
+@app_views.route('/users/reset_token', methods=['POST'], strict_slashes=False)
+def reset_password_token():
+    """
+    Generates password reset token and sends it via email
+    """
+    data = request.json
+    if not data:
+        return jsonify({'error': 'Not a Json'}), 400
+    uuid = generate_uuid()
+    email = data.get('email')
+    if not email:
+        return jsonify({'error': 'Email not Found'})
+    user = User.objects(email=email).first()
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+    setattr(user, 'reset_token', uuid)
+    user.save()
+    msg = f'passwod reset token is {uuid}'
+    send_email(user.email, 'Reset Password', msg)
+    return jsonify({'message': 'Reset token sent to your email'}), 200
+
+
+@app_views.route('/users/reset_token', methods=['PUT'], strict_slashes=False)
+def reset_password():
+    """
+    Resets user password
+    """
+    from uuid import UUID
+    data = request.json
+    if not data:
+        return jsonify({'error': 'Not a Json'}), 400
+    required = ['password', 'token']
+    for field in required:
+        if field not in data:
+            return jsonify({'error': f'{field} not found'}), 400
+    token = data.get('token')
+    password = data.get('password')
+    password = hash_password(password)
+    user = User.objects(reset_token=token).first()
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+    setattr(user, 'password', password)
+    user.save()
+    user.update(unset__reset_token=1)
+    return jsonify({'Message': 'Password changed'}), 200
