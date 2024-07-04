@@ -57,6 +57,8 @@ def cancel_request(ride_id):
     """
     user_id = get_jwt_identity()
     ride = Ride.objects(id=ride_id).first()
+    if not ride:
+        return jsonify({'error': 'Ride not found'}), 404
     if user_id in ride.booked_seats:
         ride.remove_booking(user_id)
         # add users cancelled trips
