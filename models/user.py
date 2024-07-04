@@ -62,16 +62,17 @@ class User(mongoengine.Document):
     role = mongoengine.StringField(default='passenger')
     driver_details = mongoengine.EmbeddedDocumentField(DriverDetails)
     reviews = mongoengine.EmbeddedDocumentListField(Review)
-    reset_token = mongoengine.UUIDField()
+    reset_token = mongoengine.UUIDField(binary=False)
     account_verified = mongoengine.BooleanField(default=False)
     created_at = mongoengine.DateTimeField(default=datetime.now)
     updated_at = mongoengine.DateTimeField()
+    confirmation_token = mongoengine.UUIDField(binary=False)
 
     def todict(self):
         """
         Returns a dictionary representation of object attributes
         """
-        skip_fields = ['password', 'reset_token']
+        skip_fields = ['password', 'reset_token', 'confirmation_token']
         obj_dict = {}
         for field_name in self._fields.keys():
             if field_name in skip_fields:
@@ -92,6 +93,7 @@ class User(mongoengine.Document):
             obj_dict[field_name] = value
         if self.role == 'passenger':
             del obj_dict['driver_details']
+
         return obj_dict
 
     meta = {
