@@ -38,7 +38,7 @@ class Ride(mongoengine.Document):
     booked_seats = mongoengine.ListField()
     requests = mongoengine.EmbeddedDocumentListField(Request)
     offer_trip_fee = mongoengine.FloatField(required=True)
-    trip_fee = mongoengine.FloatField(require=True)
+    trip_fee = mongoengine.FloatField()
     reviewed = mongoengine.BooleanField(default=False)
     status = mongoengine.StringField(default='pending')
     updated_at = mongoengine.DateTimeField()
@@ -65,10 +65,8 @@ class Ride(mongoengine.Document):
         passangers = len(self.booked_seats) + 1
         self.offer_trip_fee = self.chargeable_fare() / passangers
         self.available_seats -= 1
-        if passangers == 1:
-            self.trip_fee = self.chargeable_fare()
-        else:
-            self.trip_fee = self.chargeable_fare() / passangers - 1
+        passangers -= 1
+        self.trip_fee = self.chargeable_fare() / passangers
         self.save()
 
     def remove_booking(self, user_id):
@@ -79,10 +77,11 @@ class Ride(mongoengine.Document):
         passangers = len(self.booked_seats) + 1
         self.offer_trip_fee = self.chargeable_fare() / passangers
         self.available_seats += 1
-        if passangers == 1:
+        passangers -= 1
+        if passangers < 1:
             self.trip_fee = self.chargeable_fare()
         else:
-            self.trip_fee = self.chargeable_fare() / passangers - 1
+            self.trip_fee = self.chargeable_fare() / passangers
         self.save()
 
     def todict(self):
