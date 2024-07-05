@@ -59,15 +59,15 @@ python -m api.v1.app
 
 ## API Endpoints
 ### Here are some key endpoints of the PoolPal API:
-User Registration: POST /api/register
-User Login: POST /api/login
-Create a Ride: POST /api/rides
-Search Rides: GET /api/rides
-Book a Ride: POST /api/rides/{ride_id}/book
-Cancel Booking: DELETE /api/rides/{ride_id}/book
-Get Notifications: GET /api/notifications
-Leave Feedback: POST /api/rides/{ride_id}/feedback
-For a complete list of endpoints and to test them, please visit our [Swagger API Documentation] (localhost:5000/docs)
+- User Registration: POST /api/register
+- User Login: POST /api/login
+- Create a Ride: POST /api/rides
+- Search Rides: GET /api/rides
+- Book a Ride: POST /api/rides/{ride_id}/book
+- Cancel Booking: DELETE /api/rides/{ride_id}/book
+- Get Notifications: GET /api/notifications
+- Leave Feedback: POST /api/rides/{ride_id}/feedback
+- For a complete list of endpoints and to test them, please visit our [Swagger API Documentation] (localhost:5000/docs)
 
 ## Contributing
 If you would like to contribute to this project, please fork the repository and submit a pull request. We welcome all contributions.
