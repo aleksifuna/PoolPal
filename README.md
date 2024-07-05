@@ -67,7 +67,7 @@ python -m api.v1.app
 - Cancel Booking: DELETE /api/rides/{ride_id}/book
 - Get Notifications: GET /api/notifications
 - Leave Feedback: POST /api/rides/{ride_id}/feedback
-- For a complete list of endpoints and to test them, please visit our Swagger API Documentation @localhost/docs
+- For a complete list of endpoints and to test them, please visit our Swagger API Documentation /docs
 
 ## Contributing
 If you would like to contribute to this project, please fork the repository and submit a pull request. We welcome all contributions.
