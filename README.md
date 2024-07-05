@@ -15,7 +15,7 @@ This project is a carpooling web application API that enables users to share rid
 - Rating and feedback for rides
 
 ## Tech Stack
-
+![PoolPal](https://github.com/aleksifuna/PoolPal/assets/24822934/12244c8d-51c6-498b-9a75-e3f9af7f4c3c)
 ### Backend
 
 - Python Flask
