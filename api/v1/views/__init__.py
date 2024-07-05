@@ -11,3 +11,4 @@ from . import users_view
 from . import rides_view
 from . import requests_view
 from . import reviews_view
+from . import files_view
