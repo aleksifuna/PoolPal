@@ -1,8 +1,8 @@
-# PoolPal Web Application
+# PoolPal Web Application API
 
 ## Overview
 
-This project is a carpooling web application that enables users to share rides, find available rides, and manage bookings. The application is built with a Python Flask backend using MongoPy for database interactions and a frontend using HTML, CSS, Mustache.js, and jQuery. The backend serves as an API that returns JSON responses.
+This project is a carpooling web application API that enables users to share rides, find available rides, and manage bookings. The application is built with a Python Flask using MongoPy for database interactions and JWT for authentication
 
 ## Features
 
@@ -21,15 +21,53 @@ This project is a carpooling web application that enables users to share rides, 
 - MongoPy/ MongoEngine
 - JWT for authentication - flask 
 
-### Frontend
-
-- HTML, CSS
-- Mustache.js
-- jQuery
-
 ### DevOps
 
 - AWS EC2 - linux server
 - Gunicorn
 - Nginx
-- Datadog
+
+
+## Installation
+1. Clone the repository:
+```bash
+git clone https://github.com/aleksifuna/PoolPal.git
+cd PoolPal
+```
+2. Create and activate a virtual Environment:
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+3. Install the required packages:
+```bash
+pip install -r requirements.txt
+```
+4. Install and configure MongoDB
+- Follow the instructions for your operating system to install MongoDB from the [official MongoDB documentation](https://www.mongodb.com/docs/manual/installation/).
+- Start the MongoDB service:
+```bash
+sudo service mongod start
+```
+- (Optional) Use mongo shell or a GUI like MongoDB Compass to create a database for the application.
+
+5. Set up environment variables for Flask and database configutation in a .env file
+6. Run the application:
+```bash
+python -m api.v1.app
+```
+
+## API Endpoints
+### Here are some key endpoints of the PoolPal API:
+User Registration: POST /api/register
+User Login: POST /api/login
+Create a Ride: POST /api/rides
+Search Rides: GET /api/rides
+Book a Ride: POST /api/rides/{ride_id}/book
+Cancel Booking: DELETE /api/rides/{ride_id}/book
+Get Notifications: GET /api/notifications
+Leave Feedback: POST /api/rides/{ride_id}/feedback
+For a complete list of endpoints and to test them, please visit our [Swagger API Documentation] (localhost:5000/docs)
+
+## Contributing
+If you would like to contribute to this project, please fork the repository and submit a pull request. We welcome all contributions.
