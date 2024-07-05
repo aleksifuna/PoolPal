@@ -56,7 +56,7 @@ def get_user(user_id):
 
 
 @app_views.route('/users/<user_id>', methods=['PUT'], strict_slashes=False)
-@jwt_required
+@jwt_required()
 def update_user(user_id):
     """
     Updates the details of the user
