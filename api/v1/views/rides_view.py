@@ -57,6 +57,21 @@ def add_ride():
     return jsonify(ride.todict()), 201
 
 
+@app_views.route('/rides/<ride_id>', methods=['GET'], strict_slashes=False)
+@jwt_required()
+def get_ride(ride_id):
+    """
+    Return the details of a specific Ride with ride_id
+    """
+    driver_id = get_jwt_identity()
+    ride = Ride.objects(id=ride_id).first()
+    if not ride:
+        return jsonify({'error': 'Ride not found'}), 404
+    if ride.driver_id != ObjectId(driver_id):
+        return jsonify({'error': 'Not authorized'}), 401
+    return jsonify(ride.todict()), 200
+
+
 @app_views.route('/rides/<ride_id>', methods=['PUT'], strict_slashes=False)
 @jwt_required()
 def update_ride(ride_id):

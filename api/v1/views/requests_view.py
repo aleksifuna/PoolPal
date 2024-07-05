@@ -9,6 +9,7 @@ from models.user import User
 from . import app_views
 from datetime import datetime
 from bson import ObjectId
+from api.v1.utils import send_email
 
 from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended import jwt_required
@@ -41,7 +42,13 @@ def send_request(ride_id):
     setattr(req, 'user_id', user_id)
     ride.requests.append(req)
     ride.save()
-    # send email to driver to approve
+    passenger = User.objects(id=user_id).first()
+    driver = User.objects(id=str(ride.driver_id)).first()
+    send_email(
+        driver.email,
+        'New Ride Request',
+        'You have a new request. kindly respond'
+        )
     return jsonify(ride.todict()), 201
 
 
@@ -61,8 +68,13 @@ def cancel_request(ride_id):
         return jsonify({'error': 'Ride not found'}), 404
     if user_id in ride.booked_seats:
         ride.remove_booking(user_id)
-        # add users cancelled trips
-        # send email notification to driver
+    passenger = User.objects(id=user_id).first()
+    driver = User.objects(id=str(ride.driver_id)).first()
+    send_email(
+        driver.email,
+        'Booking canceled',
+        f'{passenger.first_name} Has cancelled his booking'
+        )
     Ride.objects(
         id=ride.id, requests__user_id=ObjectId(user_id)
         ).update_one(set__requests__S__status='canceled')
@@ -104,5 +116,4 @@ def accept_request(user_id):
     ride.save()
     ride.add_booking(user_id)
     ride.reload()
-    # send email to passanger with driver details
     return jsonify(ride.todict()), 200
