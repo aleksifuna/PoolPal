@@ -22,6 +22,11 @@ This project is a carpooling web application API that enables users to share rid
 - MongoPy/ MongoEngine
 - JWT for authentication - flask 
 
+### Third party services
+
+- Google distance matrix api
+- Mailjar API 
+
 ### DevOps
 
 - AWS EC2 - linux server
