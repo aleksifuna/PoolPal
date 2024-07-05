@@ -57,7 +57,7 @@ class User(mongoengine.Document):
     email = mongoengine.EmailField(required=True, unique=True)
     phone = mongoengine.StringField(required=True)
     password = mongoengine.BinaryField(required=True)
-    profile_picture = mongoengine.URLField()
+    profile_picture = mongoengine.StringField()
     preferences = mongoengine.DictField()
     role = mongoengine.StringField(default='passenger')
     driver_details = mongoengine.EmbeddedDocumentField(DriverDetails)
