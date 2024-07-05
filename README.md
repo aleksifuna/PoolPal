@@ -1,3 +1,4 @@
+![POOLPAL](https://github.com/aleksifuna/PoolPal/assets/24822934/533bf3cf-3cc7-4757-89b8-cf723e9f2404)
 # PoolPal Web Application API
 
 ## Overview
