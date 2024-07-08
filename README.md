@@ -1,3 +1,4 @@
+![POOLPAL](https://github.com/aleksifuna/PoolPal/assets/24822934/533bf3cf-3cc7-4757-89b8-cf723e9f2404)
 # PoolPal Web Application API
 
 ## Overview
@@ -14,12 +15,17 @@ This project is a carpooling web application API that enables users to share rid
 - Rating and feedback for rides
 
 ## Tech Stack
-
+![PoolPal](https://github.com/aleksifuna/PoolPal/assets/24822934/12244c8d-51c6-498b-9a75-e3f9af7f4c3c)
 ### Backend
 
 - Python Flask
 - MongoPy/ MongoEngine
 - JWT for authentication - flask 
+
+### Third party services
+
+- Google distance matrix api
+- Mailjar API 
 
 ### DevOps
 
