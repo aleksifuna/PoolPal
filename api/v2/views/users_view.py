@@ -2,20 +2,23 @@
 """
 View for User object that handles all RESTFul API actions
 """
-from flask import jsonify, request
+from flask import jsonify, request, Blueprint
 from models.user import User
 from models.user import DriverDetails
 from api.v1.utils import hash_password, send_email, generate_uuid
-from . import app_views
 from datetime import datetime
 import bcrypt
+
 
 from flask_jwt_extended import create_access_token
 from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended import jwt_required
 
 
-@app_views.route('/users', methods=['POST'], strict_slashes=False)
+user_blueprint = Blueprint('user', __name__)
+
+
+@user_blueprint.route('/users', methods=['POST'], strict_slashes=False)
 def register_user():
     """
     Registers a user
@@ -44,7 +47,7 @@ def register_user():
     return jsonify(user.todict()), 201
 
 
-@app_views.route('/users/<user_id>', methods=['GET'], strict_slashes=False)
+@user_blueprint.route('/users/<user_id>', methods=['GET'], strict_slashes=False)
 def get_user(user_id):
     """
     Returns the details of a user
@@ -55,7 +58,7 @@ def get_user(user_id):
     return jsonify({'error': 'Not Found'}), 404
 
 
-@app_views.route('/users/<user_id>', methods=['PUT'], strict_slashes=False)
+@user_blueprint.route('/users/<user_id>', methods=['PUT'], strict_slashes=False)
 @jwt_required()
 def update_user(user_id):
     """
@@ -65,7 +68,7 @@ def update_user(user_id):
     if user_id != identity:
         return jsonify({
             'error': 'unauthorized'
-            }), 401
+        }), 401
     editable = [
         'first_name',
         'last_name',
@@ -73,7 +76,7 @@ def update_user(user_id):
         'preferences',
         'profile_picture',
         'role'
-        ]
+    ]
     data = request.json
     if not data:
         return jsonify({'error': 'Not a JSON'}), 400
@@ -89,11 +92,11 @@ def update_user(user_id):
     return jsonify(user.todict()), 200
 
 
-@app_views.route(
-        '/users/<user_id>/driver',
-        methods=['POST'],
-        strict_slashes=False
-        )
+@user_blueprint.route(
+    '/users/<user_id>/driver',
+    methods=['POST'],
+    strict_slashes=False
+)
 @jwt_required()
 def add_driver_details(user_id):
     identity = get_jwt_identity()
@@ -114,7 +117,7 @@ def add_driver_details(user_id):
     if user.role == 'passenger':
         return jsonify({
             'error': 'Action can only be perfomed by drivers'
-            }), 401
+        }), 401
     if user.driver_details:
         return jsonify({'error': 'Driver details already set'}), 400
     driver_dets = DriverDetails()
@@ -125,11 +128,11 @@ def add_driver_details(user_id):
     return jsonify(user.todict()), 201
 
 
-@app_views.route(
-        '/users/<user_id>/driver',
-        methods=['PUT'],
-        strict_slashes=False
-        )
+@user_blueprint.route(
+    '/users/<user_id>/driver',
+    methods=['PUT'],
+    strict_slashes=False
+)
 @jwt_required()
 def update_driver_details(user_id):
     identity = get_jwt_identity()
@@ -143,7 +146,7 @@ def update_driver_details(user_id):
     if user.role == 'passenger':
         return jsonify({
             'error': 'Action can only be perfomed by drivers'
-            }), 401
+        }), 401
     if not user.driver_details:
         return jsonify({'error': 'No driver details set'}), 400
     data = request.json
@@ -162,7 +165,7 @@ def update_driver_details(user_id):
     return jsonify(user.todict()), 200
 
 
-@app_views.route('/users/auth_token', methods=['POST'], strict_slashes=False)
+@user_blueprint.route('/users/auth_token', methods=['POST'], strict_slashes=False)
 def user_login():
     """
     Creates authorization token for the user to login
@@ -183,10 +186,10 @@ def user_login():
     return jsonify(access_token=access_token)
 
 
-@app_views.route(
-        '/users/confirmations/<uuid>',
-        methods=['GET'],
-        strict_slashes=False)
+@user_blueprint.route(
+    '/users/confirmations/<uuid>',
+    methods=['GET'],
+    strict_slashes=False)
 @jwt_required()
 def confirm_account(uuid):
     """
@@ -204,7 +207,7 @@ def confirm_account(uuid):
     return jsonify({'error': 'Verification Failed'}), 400
 
 
-@app_views.route('/users/reset_token', methods=['POST'], strict_slashes=False)
+@user_blueprint.route('/users/reset_token', methods=['POST'], strict_slashes=False)
 def reset_password_token():
     """
     Generates password reset token and sends it via email
@@ -226,7 +229,7 @@ def reset_password_token():
     return jsonify({'message': 'Reset token sent to your email'}), 200
 
 
-@app_views.route('/users/reset_token', methods=['PUT'], strict_slashes=False)
+@user_blueprint.route('/users/reset_token', methods=['PUT'], strict_slashes=False)
 def reset_password():
     """
     Resets user password
