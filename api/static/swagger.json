@@ -6,7 +6,7 @@
       "title": "Poolpal Ridesharing Service API"
     },
     "host": "127.0.0.1:5000",
-    "basePath": "/api/v1",
+    "basePath": "/api/v2",
     "schemes": [
       "http"
     ],
