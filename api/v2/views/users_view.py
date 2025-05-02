@@ -2,7 +2,7 @@
 """
 View for User object that handles all RESTFul API actions
 """
-from flask import jsonify, request, Blueprint
+from flask import jsonify, request, Blueprint, make_response
 from api.v2.models.user import User
 from api.v2.models.user import DriverDetails
 from api.v2.utils import hash_password, send_email, generate_uuid
@@ -11,7 +11,7 @@ from datetime import datetime
 import bcrypt
 
 
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token, create_refresh_token
 from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended import jwt_required
 
@@ -168,7 +168,59 @@ def user_login():
     if not bcrypt.checkpw(data["password"].encode("utf-8"), user.password):
         return jsonify({"error": "Wrong Email or Password"}), 400
     access_token = create_access_token(identity=str(user.id))
-    return jsonify(access_token=access_token)
+    refresh_token = create_refresh_token(identity=str(user.id))
+    response = make_response(jsonify(access_token=access_token))
+    response.set_cookie(
+        "refresh_token",
+        refresh_token,
+        httponly=True,
+        max_age=60 * 60 * 24 * 15,
+        path="/api/v2/users/refesh_token",
+        secure=False,
+        samesite="Strict",
+    )
+    return response, 200
+
+
+@users_blueprint.route("/users/refresh_token", methods=["GET"], strict_slashes=False)
+@jwt_required(refresh=True)
+def refresh_token():
+    """
+    Refreshes the access token
+    """
+    identity = get_jwt_identity()
+    access_token = create_access_token(identity=identity)
+    refresh_token = create_refresh_token(identity=identity)
+    response = make_response(jsonify(access_token=access_token))
+    response.set_cookie(
+        "refresh_token",
+        refresh_token,
+        httponly=True,
+        max_age=0,
+        path="/api/v2/users/refresh_token",
+        secure=False,
+        samesite="Strict",
+    )
+    return response, 200
+
+
+@users_blueprint.route("/users/logout", methods=["DELETE"], strict_slashes=False)
+@jwt_required()
+def logout():
+    """
+    Logs out the user
+    """
+    response = make_response(jsonify({"message": "Logged Out"}))
+    response.set_cookie(
+        "refresh_token",
+        "",
+        httponly=True,
+        max_age=0,
+        path="/api/v2/users/refresh_token",
+        secure=False,
+        samesite="Strict",
+    )
+    return response, 200
 
 
 @users_blueprint.route(
