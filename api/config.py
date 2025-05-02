@@ -18,6 +18,14 @@ class Config:
     SQLALCEMY_TRACK_MODIFICATIONS = False
     DEBUG = False
     TESTING = False
+    JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY')
+    UPLOAD_FOLDER = os.getenv('UPLOAD_FOLDER')
+    UPLOAD_EXTENSIONS = os.getenv('UPLOAD_EXTENSIONS')
+    MONGODB_HOST = os.getenv('MONGO_URI')
+    MONGODB_PORT = os.getenv('MONGO_PORT')
+    MONGODB_USERNAME = os.getenv('MONGO_USERNAME')
+    MONGODB_PASSWORD = os.getenv('MONGO_PASSWORD')
+    MONGODB_DB = os.getenv('MONGO_DB')
 
 
 class DevelopmentConfig(Config):

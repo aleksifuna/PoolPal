@@ -5,7 +5,7 @@ View for User object that handles all RESTFul API actions
 from flask import jsonify, request
 from models.user import User
 from models.user import DriverDetails
-from api.v1.utils import hash_password, send_email, generate_uuid
+from utils import hash_password, send_email, generate_uuid
 from . import app_views
 from datetime import datetime
 import bcrypt
@@ -65,7 +65,7 @@ def update_user(user_id):
     if user_id != identity:
         return jsonify({
             'error': 'unauthorized'
-            }), 401
+        }), 401
     editable = [
         'first_name',
         'last_name',
@@ -73,7 +73,7 @@ def update_user(user_id):
         'preferences',
         'profile_picture',
         'role'
-        ]
+    ]
     data = request.json
     if not data:
         return jsonify({'error': 'Not a JSON'}), 400
@@ -90,10 +90,10 @@ def update_user(user_id):
 
 
 @app_views.route(
-        '/users/<user_id>/driver',
-        methods=['POST'],
-        strict_slashes=False
-        )
+    '/users/<user_id>/driver',
+    methods=['POST'],
+    strict_slashes=False
+)
 @jwt_required()
 def add_driver_details(user_id):
     identity = get_jwt_identity()
@@ -114,7 +114,7 @@ def add_driver_details(user_id):
     if user.role == 'passenger':
         return jsonify({
             'error': 'Action can only be perfomed by drivers'
-            }), 401
+        }), 401
     if user.driver_details:
         return jsonify({'error': 'Driver details already set'}), 400
     driver_dets = DriverDetails()
@@ -126,10 +126,10 @@ def add_driver_details(user_id):
 
 
 @app_views.route(
-        '/users/<user_id>/driver',
-        methods=['PUT'],
-        strict_slashes=False
-        )
+    '/users/<user_id>/driver',
+    methods=['PUT'],
+    strict_slashes=False
+)
 @jwt_required()
 def update_driver_details(user_id):
     identity = get_jwt_identity()
@@ -143,7 +143,7 @@ def update_driver_details(user_id):
     if user.role == 'passenger':
         return jsonify({
             'error': 'Action can only be perfomed by drivers'
-            }), 401
+        }), 401
     if not user.driver_details:
         return jsonify({'error': 'No driver details set'}), 400
     data = request.json
@@ -184,9 +184,9 @@ def user_login():
 
 
 @app_views.route(
-        '/users/confirmations/<uuid>',
-        methods=['GET'],
-        strict_slashes=False)
+    '/users/confirmations/<uuid>',
+    methods=['GET'],
+    strict_slashes=False)
 @jwt_required()
 def confirm_account(uuid):
     """

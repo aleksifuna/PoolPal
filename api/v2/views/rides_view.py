@@ -5,7 +5,7 @@ view for Ride object that handles all the RESTFul API actions
 from flask import jsonify, request, Blueprint
 from models.user import User
 from models.ride import Ride
-from api.v1.utils import get_distance
+from utils import get_distance
 from datetime import datetime
 from bson import ObjectId
 import re
