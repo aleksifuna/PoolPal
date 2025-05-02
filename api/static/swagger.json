@@ -1,0 +1,1051 @@
+{
+    "swagger": "2.0",
+    "info": {
+      "description": "This is the API documentation for the Poolpal Ridesharing Service, which enables the management of ridesharing or carpooling services. The API supports user account management, ride management, request handling, and reviews.",
+      "version": "1.0.0",
+      "title": "Poolpal Ridesharing Service API"
+    },
+    "host": "127.0.0.1:5000",
+    "basePath": "/api/v1",
+    "schemes": [
+      "http"
+    ],
+    "paths": {
+      "/users": {
+        "post": {
+          "summary": "Register a new user",
+          "tags": ["Account Management"],
+          "description": "Creates a user account for both drivers and passengers",
+          "parameters": [
+            {
+              "in": "body",
+              "name": "body",
+              "description": "User object that needs to be added",
+              "required": true,
+              "schema": {
+                "$ref": "#/definitions/User_reg"
+              }
+            }
+          ],
+          "responses": {
+            "201": {
+              "description": "User created"
+            },
+            "400": {
+              "description": "Invalid input"
+            }
+          }
+        }
+      },
+      "/users/{user_id}": {
+        "get": {
+          "summary": "Get user by ID",
+          "tags": ["Account Management"],
+          "description": "Returns the details of a user",
+          "parameters": [
+            {
+              "name": "user_id",
+              "in": "path",
+              "required": true,
+              "type": "string"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful operation"
+            },
+            "404": {
+              "description": "User not found"
+            }
+          }
+        },
+        "put": {
+          "summary": "Update user details",
+          "tags": ["Account Management"],
+          "description": "Updates the details of the user",
+          "parameters": [
+            {
+              "name": "user_id",
+              "in": "path",
+              "required": true,
+              "type": "string"
+            },
+            {
+              "in": "body",
+              "name": "body",
+              "description": "User object that needs to be updated",
+              "required": false,
+              "schema": {
+                "$ref": "#/definitions/UserUpdate"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "User updated"
+            },
+            "400": {
+              "description": "Invalid input"
+            },
+            "401": {
+              "description": "Unauthorized"
+            },
+            "404": {
+              "description": "User not found"
+            }
+          },
+          "security": [
+            {
+              "jwt": []
+            }
+          ]
+        }
+      },
+      "/users/{user_id}/driver": {
+        "post": {
+          "summary": "Add driver details",
+          "tags": ["Account Management"],
+          "description": "Adds driver details ie Car details",
+          "parameters": [
+            {
+              "name": "user_id",
+              "in": "path",
+              "required": true,
+              "type": "string"
+            },
+            {
+              "in": "body",
+              "name": "body",
+              "description": "Driver details that need to be added",
+              "required": true,
+              "schema": {
+                "$ref": "#/definitions/DriverDetails"
+              }
+            }
+          ],
+          "responses": {
+            "201": {
+              "description": "Driver details added"
+            },
+            "400": {
+              "description": "Invalid input"
+            },
+            "401": {
+              "description": "Unauthorized"
+            },
+            "404": {
+              "description": "User not found"
+            }
+          },
+          "security": [
+            {
+              "jwt": []
+            }
+          ]
+        },
+        "put": {
+          "summary": "Update driver details",
+          "tags": ["Account Management"],
+          "description": "Updates driver car details",
+          "parameters": [
+            {
+              "name": "user_id",
+              "in": "path",
+              "required": true,
+              "type": "string"
+            },
+            {
+              "in": "body",
+              "name": "body",
+              "description": "Driver car details that need to be updated",
+              "required": true,
+              "schema": {
+                "$ref": "#/definitions/DriverDetails"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Driver details updated"
+            },
+            "400": {
+              "description": "Invalid input"
+            },
+            "401": {
+              "description": "Unauthorized"
+            },
+            "404": {
+              "description": "User not found"
+            }
+          },
+          "security": [
+            {
+              "jwt": []
+            }
+          ]
+        }
+      },
+      "/users/auth_token": {
+        "post": {
+          "summary": "User login",
+          "tags": ["Auth"],
+          "description": "Creates authorization token for the user to login",
+          "parameters": [
+            {
+              "in": "body",
+              "name": "body",
+              "description": "User login details",
+              "required": true,
+              "schema": {
+                "$ref": "#/definitions/Login"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Login successful"
+            },
+            "400": {
+              "description": "Invalid input"
+            },
+            "404": {
+              "description": "User not found"
+            }
+          }
+        }
+      },
+      "/users/confirmations/{uuid}": {
+        "get": {
+          "summary": "Confirm user account",
+          "tags": ["Account Management"],
+          "description": "Verifies account with uuid",
+          "parameters": [
+            {
+              "name": "uuid",
+              "in": "path",
+              "required": true,
+              "type": "string"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Account verified"
+            },
+            "400": {
+              "description": "Verification failed"
+            },
+            "404": {
+              "description": "User not found"
+            }
+          },
+          "security": [
+            {
+              "jwt": []
+            }
+          ]
+        }
+      },
+      "/users/reset_token": {
+        "post": {
+          "summary": "Generate password reset token",
+          "tags": ["Account Management"],
+          "description": "Generates password reset token and sends it via email",
+          "parameters": [
+            {
+              "in": "body",
+              "name": "body",
+              "description": "Email to send the reset token",
+              "required": true,
+              "schema": {
+                "$ref": "#/definitions/ResetPasswordEmail"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Reset token sent"
+            },
+            "400": {
+              "description": "Invalid input"
+            },
+            "404": {
+              "description": "User not found"
+            }
+          }
+        },
+        "put": {
+          "summary": "Reset user password",
+          "tags": ["Account Management"],
+          "description": "Resets user password",
+          "parameters": [
+            {
+              "in": "body",
+              "name": "body",
+              "description": "Password reset details",
+              "required": true,
+              "schema": {
+                "$ref": "#/definitions/ResetPassword"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Password changed"
+            },
+            "400": {
+              "description": "Invalid input"
+            },
+            "404": {
+              "description": "User not found"
+            }
+          }
+        }
+      },
+      "/rides": {
+        "post": {
+          "summary": "Create a new ride",
+          "tags": ["Rides"],
+          "security": [
+            {
+              "jwt": []
+            }
+          ],
+          "parameters": [
+            {
+                "in": "body",
+                "name": "body",
+                "description": "Password reset details",
+                "required": true,
+                "schema": {
+                    "$ref": "#/definitions/Ride"
+                  }
+              }
+          ],
+          "responses": {
+            "201": {"description": "Ride created successfully"},
+            "400": {
+              "description": "Bad request"
+            },
+            "401": {
+              "description": "Unauthorized - Only drivers can perform this action"
+            }
+          }
+        }
+      },
+      "/rides/{ride_id}": {
+        "put": {
+          "summary": "Update ride details",
+          "tags": ["Rides"],
+          "security": [
+            {
+              "jwt": []
+            }
+          ],
+          "parameters": [
+            {
+              "name": "ride_id",
+              "in": "path",
+              "required": true,
+              "type": "string"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Ride updated successfully",
+              "schema": {
+                "$ref": "#/definitions/Ride"
+              }
+            },
+            "400": {
+              "description": "Bad request",
+              "schema": {
+                "$ref": "#/definitions/Error"
+              }
+            },
+            "401": {
+              "description": "Unauthorized - Not authorized to edit this ride",
+              "schema": {
+                "$ref": "#/definitions/Error"
+              }
+            },
+            "404": {
+              "description": "Ride not found",
+              "schema": {
+                "$ref": "#/definitions/Error"
+              }
+            }
+          }
+        },
+        "get": {
+            "summary": "Get ride details",
+            "tags": ["Rides"],
+            "description": "Returns the details of a specific Ride identified by ride_id",
+            "parameters": [
+              {
+                "name": "ride_id",
+                "in": "path",
+                "required": true,
+                "type": "string",
+                "description": "ID of the ride to fetch details"
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "Successful operation",
+                "schema": {
+                  "$ref": "#/definitions/Ride"
+                }
+              },
+              "401": {
+                "description": "Unauthorized",
+                "schema": {
+                  "$ref": "#/definitions/Error"
+                }
+              },
+              "404": {
+                "description": "Ride not found",
+                "schema": {
+                  "$ref": "#/definitions/Error"
+                }
+              }
+            },
+            "security": [
+              {
+                "jwt": []
+              }
+            ]
+          }
+      },
+      "/rides/trips": {
+        "post": {
+          "summary": "Search rides",
+          "tags": ["Rides"],
+          "parameters": [
+            {
+              "in": "body",
+              "name": "body",
+              "description": "Origin, Destination and Time",
+              "required": true,
+              "schema": {
+                "$ref": "#/definitions/Search"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "List of rides matching the search criteria",
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/definitions/Ride_details"
+                }
+              }
+            },
+            "400": {
+              "description": "Bad request",
+              "schema": {
+                "$ref": "#/definitions/Error"
+              }
+            }
+          }
+        }
+      },
+      "/rides/{ride_id}/requests": {
+        "post": {
+          "summary": "Send a request to join a ride",
+          "tags": ["Requests"],
+          "security": [
+            {
+              "jwt": []
+            }
+          ],
+          "parameters": [
+            {
+              "name": "ride_id",
+              "in": "path",
+              "required": true,
+              "type": "string"
+            }
+          ],
+          "responses": {
+            "201": {
+              "description": "Request sent successfully",
+              "schema": {
+                "$ref": "#/definitions/Ride"
+              }
+            },
+            "200": {
+              "description": "Request updated successfully",
+              "schema": {
+                "$ref": "#/definitions/Ride"
+              }
+            },
+            "400": {
+              "description": "Bad request",
+              "schema": {
+                "$ref": "#/definitions/Error"
+              }
+            },
+            "401": {
+              "description": "Unauthorized - Only drivers can perform this action",
+              "schema": {
+                "$ref": "#/definitions/Error"
+              }
+            },
+            "404": {
+              "description": "Ride not found",
+              "schema": {
+                "$ref": "#/definitions/Error"
+              }
+            }
+          }
+        },
+        "put": {
+          "summary": "Cancel a request to join a ride",
+          "tags": ["Requests"],
+          "security": [
+            {
+              "jwt": []
+            }
+          ],
+          "parameters": [
+            {
+              "name": "ride_id",
+              "in": "path",
+              "required": true,
+              "type": "string"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Request canceled successfully",
+              "schema": {
+                "$ref": "#/definitions/Ride"
+              }
+            },
+            "400": {
+              "description": "Bad request",
+              "schema": {
+                "$ref": "#/definitions/Error"
+              }
+            },
+            "401": {
+              "description": "Unauthorized",
+              "schema": {
+                "$ref": "#/definitions/Error"
+              }
+            },
+            "404": {
+              "description": "Ride not found",
+              "schema": {
+                "$ref": "#/definitions/Error"
+              }
+            }
+          }
+        }
+      },
+      "/requests": {
+      "get": {
+        "summary": "Get all requests sent by the current user",
+        "tags": ["Requests"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of requests",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Ride"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/requests/{user_id}": {
+      "post": {
+        "summary": "Accept a passenger request to join a ride",
+        "tags": ["Requests"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Request accepted successfully",
+            "schema": {
+              "$ref": "#/definitions/Ride"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Action can only be performed by driver",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "404": {
+            "description": "Ride not found",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/rides/{ride_id}/reviews": {
+        "post": {
+          "summary": "Post a driver review for a ride",
+          "tags": ["Reviews"],
+          "security": [
+            {
+              "jwt": []
+            }
+          ],
+          "parameters": [
+            {
+              "name": "ride_id",
+              "in": "path",
+              "required": true,
+              "type": "string"
+            },
+            {
+                "in": "body",
+                "name": "body",
+                "description": "Ratings and Feedback",
+                "required": true,
+                "schema": {
+                  "$ref": "#/definitions/Review"
+                }
+              }
+          ],
+          "responses": {
+            "201": {
+              "description": "Review posted successfully",
+              "schema": {
+                "$ref": "#/definitions/User"
+              }
+            },
+            "400": {
+              "description": "Bad request",
+              "schema": {
+                "$ref": "#/definitions/Error"
+              }
+            },
+            "401": {
+              "description": "Unauthorized - Cannot perform this action",
+              "schema": {
+                "$ref": "#/definitions/Error"
+              }
+            },
+            "404": {
+              "description": "Ride not found",
+              "schema": {
+                "$ref": "#/definitions/Error"
+              }
+            }
+          }
+        }
+      },
+      "/rides/{ride_id}/reviews/{user_id}": {
+        "post": {
+          "summary": "Post a passenger review for a ride",
+          "tags": ["Reviews"],
+          "security": [
+            {
+              "jwt": []
+            }
+          ],
+          "parameters": [
+            {
+              "name": "ride_id",
+              "in": "path",
+              "required": true,
+              "type": "string"
+            },
+            {
+              "name": "user_id",
+              "in": "path",
+              "required": true,
+              "type": "string"
+            },
+            {
+                "in": "body",
+                "name": "body",
+                "description": "Ratings and Feedback",
+                "required": true,
+                "schema": {
+                  "$ref": "#/definitions/Review"
+                }
+              }
+          ],
+          "responses": {
+            "201": {
+              "description": "Review posted successfully",
+              "schema": {
+                "$ref": "#/definitions/User"
+              }
+            },
+            "400": {
+              "description": "Bad request",
+              "schema": {
+                "$ref": "#/definitions/Error"
+              }
+            },
+            "401": {
+              "description": "Unauthorized - Cannot perform this action",
+              "schema": {
+                "$ref": "#/definitions/Error"
+              }
+            },
+            "404": {
+              "description": "Ride not found or Passenger not found",
+              "schema": {
+                "$ref": "#/definitions/Error"
+              }
+            }
+          }
+        }
+      },
+      "/users/profile_pic": {
+        "post": {
+          "summary": "Upload profile picture",
+          "tags": ["Account Management"],
+          "description": "Handles uploading of user's profile picture",
+          "consumes": ["multipart/form-data"],
+          "parameters": [
+            {
+              "name": "file",
+              "in": "formData",
+              "description": "Profile picture to upload",
+              "required": true,
+              "type": "file"
+            }
+          ],
+          "responses": {
+            "201": {
+              "description": "Profile picture uploaded successfully",
+            },
+            "400": {
+              "description": "Bad request",
+              "schema": {
+                "$ref": "#/definitions/Error"
+              }
+            },
+            "401": {
+              "description": "Unauthorized",
+              "schema": {
+                "$ref": "#/definitions/Error"
+              }
+            }
+          },
+          "security": [
+            {
+              "jwt": []
+            }
+          ]
+        }
+      },
+      "/users/profile_pic/{file_name}": {
+        "get": {
+          "summary": "Get profile picture",
+          "tags": ["Account Management"],
+          "description": "Returns the profile picture of user based on filename",
+          "parameters": [
+            {
+              "name": "file_name",
+              "in": "path",
+              "description": "Filename of the profile picture",
+              "required": true,
+              "type": "string"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Profile picture retrieved",
+              "schema": {
+                "type": "file"
+              }
+            },
+            "404": {
+              "description": "Profile picture not found",
+              "schema": {
+                "$ref": "#/definitions/Error"
+              }
+            }
+          }
+        }
+      }
+    },
+    "definitions": {
+      "User": {
+        "type": "object",
+        "required": [
+          "first_name",
+          "email",
+          "phone",
+          "password"
+        ],
+        "properties": {
+          "first_name": {"type": "string"},
+          "last_name": {"type": "string"},
+          "email": {"type": "string"},
+          "phone": {"type": "string"},
+          "password": {"type": "string"}
+        }
+      },
+      "User_reg": {
+        "type": "object",
+        "required": [
+          "first_name",
+          "email",
+          "phone",
+          "password"
+        ],
+        "properties": {
+          "first_name": {"type": "string"},
+          "email": {"type": "string"},
+          "phone": {"type": "string"},
+          "password": {"type": "string"}
+        }
+      },
+      "UserUpdate": {
+        "type": "object",
+        "properties": {
+          "first_name": {
+            "type": "string"
+          },
+          "last_name": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "preferences": {
+            "type": "object",
+            "properties": {
+                "smoking": {
+                    "type": "boolean",
+                    "default": false
+                },
+                "music": {
+                    "type": "boolean",
+                    "default": true
+                },
+                "chat": {
+                    "type": "boolean",
+                    "default": false
+                }
+            }
+        },
+          "profile_picture": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          }
+        }
+      },
+      "DriverDetails": {
+        "type": "object",
+        "required": [
+          "car_model",
+          "car_number_plate",
+          "license_number"
+        ],
+        "properties": {
+          "car_model": {
+            "type": "string"
+          },
+          "car_number_plate": {
+            "type": "string"
+          },
+          "license_number": {
+            "type": "string"
+          }
+        }
+      },
+      "Login": {
+        "type": "object",
+        "required": [
+          "email",
+          "password"
+        ],
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        }
+      },
+      "ResetPasswordEmail": {
+        "type": "object",
+        "required": [
+          "email"
+        ],
+        "properties": {
+          "email": {
+            "type": "string"
+          }
+        }
+      },
+      "ResetPassword": {
+        "type": "object",
+        "required": [
+          "password",
+          "token"
+        ],
+        "properties": {
+          "password": {
+            "type": "string"
+          },
+          "token": {
+            "type": "string"
+          }
+        }
+      },
+      "Ride": {
+        "type": "object",
+        "properties": {
+          "origin": {
+            "type": "string"
+          },
+          "destination": {
+            "type": "string"
+          },
+          "date_time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "available_seats": {
+            "type": "integer"
+          }
+        }
+      },
+      "Search": {
+        "type": "object",
+        "properties": {
+          "origin": {
+            "type": "string"
+          },
+          "destination": {
+            "type": "string"
+          },
+          "date_time": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
+          }
+        }
+      },
+      "Ride_details": {
+      "type": "object",
+      "properties": {
+        "origin": {
+          "type": "string"
+        },
+        "destination": {
+          "type": "string"
+        },
+        "date_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "available_seats": {
+          "type": "integer"
+        },
+        "distance": {
+          "type": "number"
+        },
+        "offer_trip_fee": {
+          "type": "number"
+        },
+        "driver_id": {
+          "type": "string",
+          "format": "objectid"
+        }
+      }
+    },
+    "Request": {
+        "type": "object",
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "format": "objectid"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["pending", "approved", "canceled"]
+          }
+        }
+      },
+      "Review": {
+        "type": "object",
+        "properties": {
+          "rating": {
+            "type": "number"
+          },
+          "feedback": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "securityDefinitions": {
+      "jwt": {
+        "type": "apiKey",
+        "name": "Authorization",
+        "in": "header"
+      }
+    },
+    "tags": [
+      {
+        "name": "Account Management",
+        "description": "Operations related to account management"
+      },
+      {
+        "name": "Rides",
+        "description": "Operations related to rides creation and management"
+      },
+      {
+        "name": "Auth",
+        "description": "Operations related to account authentication"
+      },
+      {
+        "name": "Requests",
+        "description": "Operations related to passenger ride requests"
+      },
+      {
+        "name": "Reviews",
+        "description": "Operations related to user reviews"
+      }
+    ]
+  }
+  
