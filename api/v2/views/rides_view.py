@@ -2,10 +2,9 @@
 """
 view for Ride object that handles all the RESTFul API actions
 """
-from flask import jsonify, request
+from flask import jsonify, request, Blueprint
 from models.user import User
 from models.ride import Ride
-from . import app_views
 from api.v1.utils import get_distance
 from datetime import datetime
 from bson import ObjectId
@@ -14,8 +13,10 @@ import re
 from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended import jwt_required
 
+rides_blueprint = Blueprint('rides', __name__)
 
-@app_views.route('/rides', methods=['POST'], strict_slashes=False)
+
+@rides_blueprint.route('/rides', methods=['POST'], strict_slashes=False)
 @jwt_required()
 def add_ride():
     """
@@ -27,7 +28,7 @@ def add_ride():
         'destination',
         'date_time',
         'available_seats'
-        ]
+    ]
     data = request.json
     for field in required:
         if field not in data:
@@ -57,7 +58,7 @@ def add_ride():
     return jsonify(ride.todict()), 201
 
 
-@app_views.route('/rides/<ride_id>', methods=['GET'], strict_slashes=False)
+@rides_blueprint.route('/rides/<ride_id>', methods=['GET'], strict_slashes=False)
 @jwt_required()
 def get_ride(ride_id):
     """
@@ -72,7 +73,7 @@ def get_ride(ride_id):
     return jsonify(ride.todict()), 200
 
 
-@app_views.route('/rides/<ride_id>', methods=['PUT'], strict_slashes=False)
+@rides_blueprint.route('/rides/<ride_id>', methods=['PUT'], strict_slashes=False)
 @jwt_required()
 def update_ride(ride_id):
     """
@@ -84,7 +85,7 @@ def update_ride(ride_id):
         'distance',
         'date_time',
         'available_seats'
-        ]
+    ]
     driver_id = get_jwt_identity()
     ride = Ride.objects(id=ride_id).first()
     if not ride:
@@ -105,7 +106,7 @@ def update_ride(ride_id):
     return jsonify(ride.todict()), 200
 
 
-@app_views.route('/rides/trips', methods=['POST'], strict_slashes=False)
+@rides_blueprint.route('/rides/trips', methods=['POST'], strict_slashes=False)
 def search_rides():
     """
     Searches and returns rides
