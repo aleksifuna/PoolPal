@@ -4,11 +4,13 @@ Module supplies routes that handle file updloads
 """
 import os
 from werkzeug.utils import secure_filename
-from . import app_views
 from models.user import User
-from flask import send_from_directory, jsonify, request, current_app
+from flask import send_from_directory, jsonify, request, current_app, Blueprint
 from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended import jwt_required
+
+
+file_blueprint = Blueprint('files', __name__)
 
 
 def allowed_file(filename):
@@ -19,7 +21,7 @@ def allowed_file(filename):
     return False
 
 
-@app_views.route('/users/profile_pic', methods=['POST'], strict_slashes=False)
+@file_blueprint.route('/users/profile_pic', methods=['POST'], strict_slashes=False)
 @jwt_required()
 def profile_pic_upload():
     """
@@ -44,7 +46,7 @@ def profile_pic_upload():
     return jsonify({'Status': 'Success'}), 201
 
 
-@app_views.route(
+@file_blueprint.route(
     '/users/profile_pic/<file_name>',
     methods=['GET'],
     strict_slashes=False

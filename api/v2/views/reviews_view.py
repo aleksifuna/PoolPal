@@ -2,22 +2,24 @@
 """
 View for handling sending of reviews API actions
 """
-from flask import jsonify, request
+from flask import jsonify, request, Blueprint
 from models.user import User
 from models.user import Review
 from models.ride import Ride
-from . import app_views
 from bson import ObjectId
 
 from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended import jwt_required
 
 
-@app_views.route(
-        'rides/<ride_id>/reviews',
-        methods=['POST'],
-        strict_slashes=False
-        )
+reviews_blueprint = Blueprint('reviews', __name__)
+
+
+@reviews_blueprint.route(
+    'rides/<ride_id>/reviews',
+    methods=['POST'],
+    strict_slashes=False
+)
 @jwt_required()
 def post_driver_review(ride_id):
     """
@@ -48,11 +50,11 @@ def post_driver_review(ride_id):
     return (driver.todict()), 201
 
 
-@app_views.route(
+@reviews_blueprint.route(
     '/rides/<ride_id>/reviews/<user_id>',
     methods=['POST'],
     strict_slashes=False
-    )
+)
 @jwt_required()
 def post_passenger_review(ride_id, user_id):
     """
