@@ -24,9 +24,9 @@ def create_app(config_name='default'):
     if config_name == 'default':
         db_name = os.getenv('DB_NAME')
     else:
-        db_name == 'poolpal_test'
+        db_name = 'poolpal_test'
 
-    connect(db=db_name, uuidRepresentation='standard')
+    connect(host=os.getenv('MONGODB_URI'), db=db_name, uuidRepresentation='standard')
 
     SWAGGER_URL = "/docs"
     API_URL = "/static/swagger.json"
