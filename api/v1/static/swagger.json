@@ -5,7 +5,7 @@
       "version": "1.0.0",
       "title": "Poolpal Ridesharing Service API"
     },
-    "host": "127.0.0.1:5000",
+    "host": "https://poolpal.onrender.com",
     "basePath": "/api/v1",
     "schemes": [
       "http"
