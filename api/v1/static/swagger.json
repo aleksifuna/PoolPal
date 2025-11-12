@@ -8,7 +8,7 @@
     "host": "poolpal.onrender.com",
     "basePath": "/api/v1",
     "schemes": [
-      "http"
+      "http", "https"
     ],
     "paths": {
       "/users": {
